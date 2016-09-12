@@ -1,0 +1,9 @@
+.price{
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.thumbnail img{
+    height: 205px;
+    width: 350px;
+}
