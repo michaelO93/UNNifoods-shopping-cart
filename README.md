@@ -1,2 +1,2 @@
 # UNNifoods-shopping-cart
-A web app for UNN restaurant to manage their restaurants orders.
+A web app for UNN restaurants community to manage their orders.
