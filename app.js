@@ -15,6 +15,7 @@ var MongoStore = require('connect-mongo/es5')(session);
 var routes = require('./routes/index');
 var userRoutes = require('./routes/user');
 var apiRestaurant = require('./routes/restaurant');
+var adminDashboard = require('./routes/dashboard');
 
 var app = express();
 
@@ -91,6 +92,8 @@ app.use(function (req, res, next) {
 app.use('/user', userRoutes);
 app.use('/', routes);
 app.use('/restaurants', apiRestaurant);
+app.use('/dashboard', adminDashboard);
+
 
 app.get('/shopping-cart/auth/facebook/',
     passport.authenticate('facebook.login',{scope:'email'}));
@@ -98,7 +101,7 @@ app.get('/shopping-cart/auth/facebook/',
 app.get('/shopping-cart/auth/facebook/callback/',
     passport.authenticate('facebook.login',
         {
-            successRedirect: '/user/profile',
+            successRedirect: '/dashboard',
             failureRedirect: '/user/signin'
         })
 );
@@ -226,9 +229,10 @@ app.post('/api/restaurants/orders', function (req,res,next) {
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+    var error = new Error('Not Found');
+    error.status = 404;
+    // next(error);
+    res.render('error',{error:error})
 });
 
 // error handlers

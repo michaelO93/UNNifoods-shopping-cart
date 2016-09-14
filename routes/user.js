@@ -6,10 +6,6 @@ var router = express.Router(),
 var csrfProtection = csrf();
 router.use(csrfProtection);
 
-router.get('/profile', isLoggedIn, function (req, res, next) {
-    res.render('user/profile');
-});
-
 router.get('/logout', isLoggedIn, function (req, res, next) {
     req.logout();
     res.redirect('/');
@@ -24,7 +20,7 @@ router.get('/signup', function (req, res, next) {
     res.render('user/signup', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});
 });
 router.post('/signup', passport.authenticate('local.signup', {
-    successRedirect: '/user/profile',
+    successRedirect: '/dashboard',
     failureRedirect: '/user/signup',
     failureFlash: true
 }));
@@ -64,11 +60,10 @@ router.get('/signin', function (req, res, next) {
 });
 
 router.post('/signin', passport.authenticate('local.signin', {
-    successRedirect: '/user/profile',
+    successRedirect: '/dashboard',
     failureRedirect: '/user/signin',
     failureFlash: true
 }));
-
 
 module.exports = router;
 
