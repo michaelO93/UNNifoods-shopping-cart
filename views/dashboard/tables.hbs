@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lumino - Tables</title>
 
-<link href="../../public/dashboard/css/bootstrap.min.css" rel="stylesheet">
-<link href="../../public/dashboard/css/datepicker3.css" rel="stylesheet">
-<link href="../../public/dashboard/css/bootstrap-table.css" rel="stylesheet">
-<link href="../../public/dashboard/css/styles.css" rel="stylesheet">
+<link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
+<link href="/dashboard/css/datepicker3.css" rel="stylesheet">
+<link href="/dashboard/css/bootstrap-table.css" rel="stylesheet">
+<link href="/dashboard/css/styles.css" rel="stylesheet">
 
 <!--Icons-->
-<script src="../../public/dashboard/js/lumino.glyphs.js"></script>
+<script src="/dashboard/js/lumino.glyphs.js"></script>
 
 <!--[if lt IE 9]>
 	<script src="js/html5shiv.js"></script>
-	<script src="../../public/dashboard/js/respond.min.js"></script>
+	<script src="/dashboard/js/respond.min.js"></script>
 	<![endif]-->
 
 </head>
@@ -30,7 +30,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#"><span>Lumino</span>Admin</a>
+				<a class="navbar-brand" href="#"><span>UNNifoods</span> Admin</a>
 				<ul class="user-menu">
 					<li class="dropdown pull-right">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> User <span class="caret"></span></a>
@@ -53,13 +53,13 @@
 			</div>
 		</form>
 		<ul class="nav menu">
-			<li><a href="index.hbs"><svg class="glyph stroked dashboard-dial"><use xlink:href="#stroked-dashboard-dial"></use></svg> Dashboard</a></li>
-			<li><a href="widgets.html"><svg class="glyph stroked calendar"><use xlink:href="#stroked-calendar"></use></svg> Widgets</a></li>
-			<li><a href="charts.hbs"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg> Charts</a></li>
-			<li class="active"><a href="tables.hbs"><svg class="glyph stroked table"><use xlink:href="#stroked-table"></use></svg> Tables</a></li>
-			<li><a href="forms.hbs"><svg class="glyph stroked pencil"><use xlink:href="#stroked-pencil"></use></svg> Forms</a></li>
-			<li><a href="panels.hbs"><svg class="glyph stroked app-window"><use xlink:href="#stroked-app-window"></use></svg> Alerts &amp; Panels</a></li>
-			<li><a href="icons.html"><svg class="glyph stroked star"><use xlink:href="#stroked-star"></use></svg> Icons</a></li>
+			<li><a href="/dashboard"><svg class="glyph stroked dashboard-dial"><use xlink:href="#stroked-dashboard-dial"></use></svg> Dashboard</a></li>
+			<li><a href="widgets"><svg class="glyph stroked calendar"><use xlink:href="#stroked-calendar"></use></svg> Widgets</a></li>
+			<li><a href="charts"><svg class="glyph stroked line-graph"><use xlink:href="#stroked-line-graph"></use></svg> Charts</a></li>
+			<li class="active"><a href="tables"><svg class="glyph stroked table"><use xlink:href="#stroked-table"></use></svg> Tables</a></li>
+			<li><a href="/dashboard/forms"><svg class="glyph stroked pencil"><use xlink:href="#stroked-pencil"></use></svg> Forms</a></li>
+			<li><a href="panels"><svg class="glyph stroked app-window"><use xlink:href="#stroked-app-window"></use></svg> Alerts &amp; Panels</a></li>
+			<li><a href="icons"><svg class="glyph stroked star"><use xlink:href="#stroked-star"></use></svg> Icons</a></li>
 			<li class="parent ">
 				<a href="#">
 					<span data-toggle="collapse" href="#sub-item-1"><svg class="glyph stroked chevron-down"><use xlink:href="#stroked-chevron-down"></use></svg></span> Dropdown 
@@ -83,7 +83,7 @@
 				</ul>
 			</li>
 			<li role="presentation" class="divider"></li>
-			<li><a href="login.hbs"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Login Page</a></li>
+			<li><a href="login"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Login Page</a></li>
 		</ul>
 
 	</div><!--/.sidebar-->
@@ -190,15 +190,19 @@
 		
 	</div><!--/.main-->
 
-	<script src="../../public/dashboard/js/jquery-1.11.1.min.js"></script>
-	<script src="../../public/dashboard/js/bootstrap.min.js"></script>
-	<script src="../../public/dashboard/js/chart.min.js"></script>
-	<script src="../../public/dashboard/js/chart-data.js"></script>
-	<script src="../../public/dashboard/js/easypiechart.js"></script>
-	<script src="../../public/dashboard/js/easypiechart-data.js"></script>
-	<script src="../../public/dashboard/js/bootstrap-datepicker.js"></script>
-	<script src="../../public/dashboard/js/bootstrap-table.js"></script>
+	<script src="/dashboard/js/jquery-1.11.1.min.js"></script>
+	<script src="/dashboard/js/bootstrap.min.js"></script>
+	<script src="/dashboard/js/chart.min.js"></script>
+	<script src="/dashboard/js/chart-data.js"></script>
+	<script src="/dashboard/js/easypiechart.js"></script>
+	<script src="/dashboard/js/easypiechart-data.js"></script>
+	<script src="/dashboard/js/bootstrap-datepicker.js"></script>
+	<script src="/dashboard/js/bootstrap-table.js"></script>
 	<script>
+        $(document).ready(function () {
+            $('.dropdown-toggle').dropdown();
+        });
+
 		!function ($) {
 			$(document).on("click","ul.nav li.parent > a > span.icon", function(){		  
 				$(this).find('em:first').toggleClass("glyphicon-minus");	  
@@ -208,7 +212,7 @@
 
 		$(window).on('resize', function () {
 		  if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
-		})
+		});
 		$(window).on('resize', function () {
 		  if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
 		})

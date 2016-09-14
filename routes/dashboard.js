@@ -21,6 +21,21 @@ router.get('/charts',isLoggedIn, function (req,res) {
    res.render('dashboard/charts')
 });
 
+router.get('/tables', isLoggedIn, function (req,res) {
+    res.render('dashboard/tables');
+});
+
+router.get('/forms', isLoggedIn, function (req,res) {
+    res.render('dashboard/forms');
+});
+
+router.get('/panels', isLoggedIn, function (req,res) {
+    res.render('dashboard/panels');
+});
+
+router.get('/icons',isLoggedIn,function (req,res) {
+    res.render('dashboard/icons');
+});
 
 module.exports = router;
 
