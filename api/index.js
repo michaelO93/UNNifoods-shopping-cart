@@ -13,7 +13,8 @@ e.restaurant = {
     getRestaurantById: getRestaurantById,
     getRestaurantOrders : getRestaurantOrders,
     createOrderForRestaurant:createOrderForRestaurant,
-    getOrdersHistory: getRestaurantOrdersHistory
+    getOrdersHistory: getRestaurantOrdersHistory,
+    getAllOrders: getAllOrders
 };
 
 function createRestaurant(restaurant, cb) {
@@ -48,18 +49,17 @@ function  restaurantCreateProduct(data, cb) {
     var req  = {
         method :'POST',
         url: baseUrl + '/restaurant/'+ data.restaurantId + '/products',
-        form: data
+        form: data.main
     };
     return request(req, cb);
 }
 
-function getRestaurantById(data,cb) {
+function getRestaurantById(id,cb) {
     var req = {
         method:'GET',
-        url: baseUrl + '/restaurant/'+data.restaurantId,
-        form: data
+        url: baseUrl + '/restaurant/'+ id
     };
-    return request(req, cb);
+    return request(req,cb);
 }
 
 function getRestaurantOrders(data,cb) {
@@ -67,7 +67,7 @@ function getRestaurantOrders(data,cb) {
         method:'GET',
         url: baseUrl + '/restaurant/'+data.restaurantId +'/orders'
     };
-    return request(req,null,cb);
+    return request(req,cb);
 }
 
 function createOrderForRestaurant(orders,cb) {
@@ -79,7 +79,7 @@ function createOrderForRestaurant(orders,cb) {
             orderId:'@orderId'
         }
     };
-    return request(req,null,cb);
+    return request(req,cb);
 }
 
 function getRestaurantOrdersHistory(data, cb) {
@@ -88,5 +88,13 @@ function getRestaurantOrdersHistory(data, cb) {
         url:baseUrl + '/restaurants/ordersHistory',
         form:data
     };
-    return request(req, null,cb);
+    return request(req,cb);
+}
+
+function getAllOrders(cb) {
+    var req = {
+        method:'GET',
+        url : baseUrl + '/restaurant/getOrders'
+    };
+    return request(req,cb);
 }

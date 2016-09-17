@@ -32,10 +32,8 @@ router.post('/register', function (req, res) {
 router.post('/addProduct', function (req, res) {
     var formData = {};
     formData.main = req.body;
-    formData.restaurantId = req.body.restaurant_id;
-    if (!formData.restaurantId) {
-         return res.send({error: 'Can\'t create new product!'});
-    }
+    formData.restaurantId = req.body.restaurantId;
+    if (!formData.restaurantId) return res.send({error: "can\'t create product!"});
 
     apiRequests.restaurant.restaurantCreateProduct(formData, function (err, products) {
         if (err) {
@@ -43,7 +41,7 @@ router.post('/addProduct', function (req, res) {
             res.json({error: err});
             return;
         }
-        return res.json(null, {data: products});
+        res.json({error: null, data: products})
     })
 });
 router.post('/addProductImage', function (req, res) {
@@ -65,40 +63,48 @@ router.post('/addProductImage', function (req, res) {
 
 });
 
-router.get('/restaurants/:id', function (req, res) {
-  var formData = {};
-  formData.restaurantId = req.params.id;
-    if(formData){
-        return apiRequests.restaurant.getRestaurantById(formData, function (err, restaurant) {
-            if(err) {console.log(err);
-               return res.json(err);}
-               return res.json({error: null, data:restaurant})
+
+router.get('/restaurant/:id', function (req, res) {
+    console.log(req.params.id, req.body.id, req.param('id'));
+
+        return apiRequests.restaurant.getRestaurantById(req.params.id, function (err,response, restaurant) {
+            if (err) {
+                console.log(err);
+                return res.json(err);
+            }
+            console.log(response.statusCode);
+            res.json({error: null, data: restaurant})
         })
-    }
+
 });
 
-router.get('/getOrders', function (req, res, next) {
-    return apiRequests.restaurant.getRestaurantOrders(req,function (err, resp) {
-        if(err) {
+router.get('/getAllOrders', function (req, res, next) {
+    return apiRequests.restaurant.getAllOrders(function (err, resp) {
+        if (err) {
             console.log(err);
             return res.json(err.message);
         }
-        return res.render('getOrders',{data: resp});
+        if(!resp){
+            return res.send({info:'No Orders Available'})
+        }
+         res.status(200).json({data: resp});
+        // return res.render('getOrders', {data: resp});
     })
 });
 
-router.post('/orders', function (req,res,next) {
-   var data = req;
-    if(data){
+router.post('/orders', function (req, res, next) {
+    var data = req;
+    if (data) {
         apiRequests.restaurant.createOrderForRestaurant(data, function (err, resp) {
-            if(err){
+            if (err) {
                 console.log(err);
                 return res.send(err.message);
             }
-            console.log({data:resp});
-            return res.json(null, {data:resp});
+            console.log({data: resp});
+            return res.json(null, {data: resp});
         })
     }
 });
+
 module.exports = router;
 

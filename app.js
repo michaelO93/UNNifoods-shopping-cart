@@ -55,7 +55,7 @@ var app = express();
 
 mongoose.connect('mongodb://localhost/shopping', function (err, db) {
     if (err) console.log(err);
-    console.log('we are connected');
+    console.log('we are connected',db);
 });
 require('./config/passport');
 
@@ -65,7 +65,7 @@ app.engine('.hbs', expressHsb({defaultLayout: 'layout', extname: '.hbs'}));
 app.set('view engine', '.hbs');
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -91,7 +91,7 @@ app.use(function (req, res, next) {
 
 app.use('/user', userRoutes);
 app.use('/', routes);
-app.use('/restaurants', apiRestaurant);
+app.use('/restaurant', apiRestaurant);
 app.use('/dashboard', adminDashboard);
 
 
@@ -109,7 +109,7 @@ app.get('/shopping-cart/auth/facebook/callback/',
 
 //RESTful API - RESTAURANTS
 /* */
-var RestModel = require('./models/restaurants'),
+var RestModel = require('./models/restaurant'),
     productModel = require('./models/product'),
     Order = require('./models/order');
 
@@ -142,19 +142,24 @@ app.post('/api/restaurants', function (req, res, next) {
 
 });
 
+
+//creating product for  a restaurant
 app.post('/api/restaurants/:id/products', function (req, res, next) {
-    var restaurantId = req.params.id;
+    var restaurantId = req.body.restaurantId;
     if (restaurantId) {
         return RestModel.findById(restaurantId, function (err, restaurant) {
             if (err) {
                 return console.log({error: err});
             }
+            console.log(restaurant)
             var product = new productModel({
                 title: req.body.title,
                 description: req.body.description,
                 price: req.body.price,
-                imagePath: "",
-                restaurantId: restaurant.id
+                // imagePath: "",
+                restaurantId: restaurant,
+                date : new Date()
+
             });
 
             if (product) {
@@ -167,11 +172,11 @@ app.post('/api/restaurants/:id/products', function (req, res, next) {
                             }
                         }
                     } else {
-                        return console.log(result)
+                        return console.log("::::"+result)
                     }
                     return res.send(result);
                 });
-                return res.send(product);
+                return res.send("[::::]"+product);
             }
 
         })
@@ -182,18 +187,18 @@ app.post('/api/restaurants/:id/products', function (req, res, next) {
 app.get('/api/restaurants/:id', function (req, res) {
     var restaurantId = req.params.id;
     if(restaurantId){
-        RestModel.findById({_id:restaurantId}, function (err, restaurant) {
+        RestModel.findById(restaurantId, function (err, restaurant) {
             if(err){
                 console.log(err);
                 return res.send(err.message)
             }
-            return res.send(null, restaurant);
+            return res.status(200).send(restaurant);
         })
     }
 });
 
 app.get('/api/restaurants/getOrders', function (req,res,next) {
-   Orders.find({}, function (err,docs) {
+   Order.findAll({}, function (err,docs) {
        if(err) {
            console.log(err);
            return res.send(err.message);
@@ -231,8 +236,8 @@ app.post('/api/restaurants/orders', function (req,res,next) {
 app.use(function (req, res, next) {
     var error = new Error('Not Found');
     error.status = 404;
-    // next(error);
-    res.render('error',{error:error})
+    next( error);
+    // res.render('error',{error:error})
 });
 
 // error handlers

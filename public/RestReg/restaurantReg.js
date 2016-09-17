@@ -2,7 +2,7 @@
  * Created by michael-prime on 8/23/16.
  */
 var express = require('express');
-var rests = require('../../models/restaurants');
+var rests = require('../../models/restaurant');
 
 exports.createRestaurant = function (req, res, next) {
     if(req.body.restaurant){
