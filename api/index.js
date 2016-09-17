@@ -21,7 +21,6 @@ function createRestaurant(restaurant, cb) {
     var req = {
         method: 'POST',
         url: baseUrl + '/restaurants',
-        headers: {"Content-Type": "application/json"},
         form: restaurant
     };
     return request(req, cb);
@@ -95,7 +94,7 @@ function getRestaurantOrdersHistory(data, cb) {
 function getAllOrders(cb) {
     var req = {
         method:'GET',
-        url : baseUrl + '/restaurant/getOrders'
+        url : baseUrl + '/restaurants/getOrders'
     };
     return request(req,cb);
 }

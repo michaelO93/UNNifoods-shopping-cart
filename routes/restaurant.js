@@ -91,7 +91,11 @@ router.get('/getAllOrders', function (req, res, next) {
             return res.json(err.message);
         }
 
-        return res.render('getOrders', {data: resp});
+        if(!resp){
+           var message = 'No order is available '
+        }
+
+        return res.render('getOrders', {data: resp, message: message});
     })
 });
 
