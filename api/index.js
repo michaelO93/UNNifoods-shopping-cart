@@ -1,7 +1,7 @@
 var request = require('request');
 require('request-debug')(request);
 
-var baseUrl = 'http://localhost:3000/api';
+var baseUrl = process.env.BASE_URL || 'http://localhost:4000/api';
 
 var e = module.exports;
 
@@ -19,7 +19,7 @@ e.restaurant = {
 function createRestaurant(restaurant, cb) {
     var req = {
         method: 'POST',
-        url: baseUrl + '/restaurant',
+        url: baseUrl + '/restaurants',
         headers: {"Content-Type": "application/json"},
         form: restaurant
     };
@@ -29,7 +29,7 @@ function createRestaurant(restaurant, cb) {
 function addRestaurantAddr(restaurant,address, cb) {
     var req= {
         method: 'POST',
-        url: baseUrl + '/restaurant/'+ restaurant + '/addresses',
+        url: baseUrl + '/restaurants/'+ restaurant + '/addresses',
         form: address
     };
     return request(req, cb);
@@ -38,7 +38,7 @@ function addRestaurantAddr(restaurant,address, cb) {
 function addRestaurantProductImage(data, cb) {
     var req = {
         method:'POST',
-        url: baseUrl +'/restaurant/'+ data.restaurantId + '/products/' + data.productId + '/images',
+        url: baseUrl +'/restaurants/'+ data.restaurantId + '/products/' + data.productId + '/images',
         form: data.main
     };
     return request(req, cb);
@@ -47,7 +47,7 @@ function addRestaurantProductImage(data, cb) {
 function  restaurantCreateProduct(data, cb) {
     var req  = {
         method :'POST',
-        url: baseUrl + '/restaurant/'+ data.restaurantId + '/products',
+        url: baseUrl + '/restaurants/'+ data.restaurantId + '/products',
         form: data
     };
     return request(req, cb);
@@ -56,7 +56,7 @@ function  restaurantCreateProduct(data, cb) {
 function getRestaurantById(data,cb) {
     var req = {
         method:'GET',
-        url: baseUrl + '/restaurant/'+data.restaurantId,
+        url: baseUrl + '/restaurants/'+data.restaurantId,
         form: data
     };
     return request(req, cb);
@@ -65,7 +65,7 @@ function getRestaurantById(data,cb) {
 function getRestaurantOrders(data,cb) {
     var req = {
         method:'GET',
-        url: baseUrl + '/restaurant/'+data.restaurantId +'/orders'
+        url: baseUrl + '/restaurants/'+data.restaurantId +'/orders'
     };
     return request(req,null,cb);
 }
@@ -73,7 +73,7 @@ function getRestaurantOrders(data,cb) {
 function createOrderForRestaurant(orders,cb) {
     var req={
         method:'POST',
-        url:baseUrl + '/restaurant/:restaurantId/orders/:orderId',
+        url:baseUrl + '/restaurants/:restaurantId/orders/:orderId',
         params:{
             restaurantId: '@restaurantId',
             orderId:'@orderId'
