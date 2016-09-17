@@ -53,9 +53,13 @@ var app = express();
 //  if(err) return console.log(err);
 // });
 
-mongoose.connect('mongodb://localhost/shopping', function (err, db) {
-    if (err) console.log(err);
-    console.log('we are connected',db);
+mongoose.connect(process.env.DB_URI || 'mongodb://192.168.99.100:27017/shopping', function (err, db) {
+    if (err) {
+        console.log(err);
+    }else{
+        console.log('we are connected to: ', db);
+    }
+
 });
 require('./config/passport');
 
@@ -192,7 +196,9 @@ app.get('/api/restaurants/:id', function (req, res) {
                 console.log(err);
                 return res.send(err.message)
             }
+
             return res.status(200).send(restaurant);
+
         })
     }
 });
@@ -236,7 +242,7 @@ app.post('/api/restaurants/orders', function (req,res,next) {
 app.use(function (req, res, next) {
     var error = new Error('Not Found');
     error.status = 404;
-    next( error);
+    next(error);
     // res.render('error',{error:error})
 });
 

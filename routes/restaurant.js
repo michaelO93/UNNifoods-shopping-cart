@@ -64,31 +64,34 @@ router.post('/addProductImage', function (req, res) {
 });
 
 
-router.get('/restaurant/:id', function (req, res) {
-    console.log(req.params.id, req.body.id, req.param('id'));
-
-        return apiRequests.restaurant.getRestaurantById(req.params.id, function (err,response, restaurant) {
+router.get('/:id', function (req, res) {
+    var formData = {};
+    formData.restaurantId = req.params.id;
+    if (formData) {
+        return apiRequests.restaurant.getRestaurantById(formData, function (err, response) {
             if (err) {
                 console.log(err);
                 return res.json(err);
             }
-            console.log(response.statusCode);
-            res.json({error: null, data: restaurant})
+
+            console.log(response.body);
+            return res.render('user/profile', {data: response.body});
+            //return res.json({error: null, data: restaurant})
         })
+    }
 
 });
 
+
 router.get('/getAllOrders', function (req, res, next) {
     return apiRequests.restaurant.getAllOrders(function (err, resp) {
+
         if (err) {
             console.log(err);
             return res.json(err.message);
         }
-        if(!resp){
-            return res.send({info:'No Orders Available'})
-        }
-         res.status(200).json({data: resp});
-        // return res.render('getOrders', {data: resp});
+
+        return res.render('getOrders', {data: resp});
     })
 });
 
