@@ -3,6 +3,8 @@ var router = express.Router(),
     passport = require('passport'),
     csrf = require('csurf');
 
+var users = require('../models/user');
+
 var csrfProtection = csrf();
 router.use(csrfProtection);
 
@@ -16,8 +18,10 @@ router.use('/', notLoggedIn, function (req, res, next) {
 });
 
 router.get('/signup', function (req, res, next) {
+
     var messages = req.flash('error');
     res.render('user/signup', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});
+
 });
 router.post('/signup', passport.authenticate('local.signup', {
     successRedirect: '/dashboard',

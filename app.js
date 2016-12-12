@@ -9,6 +9,7 @@ var mongoose = require('mongoose');
 var session = require('express-session');
 var passport = require('passport');
 var flash = require('connect-flash');
+var multer = require('multer');
 var validator = require('express-validator');
 var MongoStore = require('connect-mongo/es5')(session);
 
@@ -16,47 +17,15 @@ var routes = require('./routes/index');
 var userRoutes = require('./routes/user');
 var apiRestaurant = require('./routes/restaurant');
 var adminDashboard = require('./routes/dashboard');
+var  dotenv = require('dotenv');
+dotenv.load({path:'.env'});
 
 var app = express();
 
-
-
-// nev.configure({
-//     verificationURL: 'http://shoppning-cart.com/email-verification/${URL}',
-//     persistentUserModel: User,
-//     tempUserCollection: 'shopping-cart-tempUsers',
-//
-//     transportOptions: {
-//         service: 'Gmail',
-//         auth: {
-//             user: 'michaelonyeforo112@gmail.com',
-//             pass: 'michael9481'
-//         }
-//     },
-//     verifyMailOptions: {
-//         from: 'Do Not Reply <noreply-shopping-cart@gmail.com>',
-//         subject: 'Please confirm account',
-//         html: 'Click the following link to confirm your account:</p><p>${URL}</p>',
-//         text: 'Please confirm your account by clicking the following link: ${URL}'
-// //     }
-// // }, function(error, options){
-//     if(error) return console.log(error);
-// });
-
-// nev.generateTempUserModel(User, function () {
-//
-// });
-// var tempUser = require('./models/tempUser');
-// nev.configure({
-//    tempUserModel : tempUser
-// }, function (err, options) {
-//  if(err) return console.log(err);
-// });
-
-mongoose.connect(process.env.DB_URI || 'mongodb://192.168.99.100:27017/shopping', function (err, db) {
+mongoose.connect('mongodb://localhost/shopping', function (err, db) {
     if (err) {
         console.log(err);
-    }else{
+    } else {
         console.log('we are connected to: ', db);
     }
 
@@ -99,23 +68,13 @@ app.use('/restaurant', apiRestaurant);
 app.use('/dashboard', adminDashboard);
 
 
-app.get('/shopping-cart/auth/facebook/',
-    passport.authenticate('facebook.login',{scope:'email'}));
-
-app.get('/shopping-cart/auth/facebook/callback/',
-    passport.authenticate('facebook.login',
-        {
-            successRedirect: '/dashboard',
-            failureRedirect: '/user/signin'
-        })
-);
-
-
 //RESTful API - RESTAURANTS
 /* */
 var RestModel = require('./models/restaurant'),
     productModel = require('./models/product'),
-    Order = require('./models/order');
+    Order = require('./models/order'),
+
+    ObjectId = require('mongoose').ObjectId;
 
 app.get('/api', function (req, res, next) {
     res.send('WELCOME TO UNNIFOODS - API');
@@ -149,20 +108,22 @@ app.post('/api/restaurants', function (req, res, next) {
 
 //creating product for  a restaurant
 app.post('/api/restaurants/:id/products', function (req, res, next) {
-    var restaurantId = req.body.restaurantId;
+    var restaurantId = req.params.id;
     if (restaurantId) {
         return RestModel.findById(restaurantId, function (err, restaurant) {
             if (err) {
                 return console.log({error: err});
             }
-            console.log(restaurant)
+            console.log(restaurant);
             var product = new productModel({
                 title: req.body.title,
                 description: req.body.description,
                 price: req.body.price,
-                // imagePath: "",
-                restaurantId: restaurant,
-                date : new Date()
+                imagePath: req.body.ImagePath,
+                restaurantId: restaurantId,
+                category: req.body.category,
+                quantity: req.body.quantity,
+                date: req.body.date
 
             });
 
@@ -172,27 +133,49 @@ app.post('/api/restaurants/:id/products', function (req, res, next) {
                         console.log(err.message);
                         if (err.name === "ValidationError") {
                             for (var field in err.errors) {
-                               console.log(":::"+err.errors[field].message);
+                                console.log(":::" + err.errors[field].message);
                             }
                         }
                     } else {
-                        return console.log("::::"+result)
+                        return res.status(200).send(product);
                     }
-                    return res.send(result);
+
                 });
-                return res.send("[::::]"+product);
+                // return res.end("[::::]"+product);
             }
 
         })
     }
 });
 
+//fetching products
+app.post('/api/restaurants/:id', function (req, res, next) {
+    var restaurantId = req.params.id;
+    var obj = {};
+
+    return productModel.findOne({restaurantId: restaurantId}, function (err, response) {
+        if (err) {
+            console.log("error " + err);
+            return err;
+        }
+        if(response == null){
+            var message = 'NO oop';
+            var m = JSON.stringify(message);
+            return res.status(200).send(m)
+        }
+        else if (response) {
+            obj = response._id;
+            console.log("datall:" + obj);
+            return res.status(200).send(response);
+        }
+    })
+});
 
 app.get('/api/restaurants/:id', function (req, res) {
     var restaurantId = req.params.id;
-    if(restaurantId){
+    if (restaurantId) {
         RestModel.findById(restaurantId, function (err, restaurant) {
-            if(err){
+            if (err) {
                 console.log(err);
                 return res.send(err.message)
             }
@@ -203,39 +186,38 @@ app.get('/api/restaurants/:id', function (req, res) {
     }
 });
 
-app.get('/api/restaurants/getOrders', function (req,res,next) {
-   Order.findAll({}, function (err,docs) {
-       if(err) {
-           console.log(err);
-           return res.send(err.message);
-       }
-       return res.send(null,docs);
-   })
+
+app.get('/api/restaurants/getOrders', function (req, res, next) {
+    Order.findAll({}, function (err, docs) {
+        if (err) {
+            console.log(err);
+            return res.send(err.message);
+        }
+        return res.send(null, docs);
+    })
 });
 
-app.post('/api/restaurants/orders', function (req,res,next) {
-    var user  = req.body['user'];
+app.post('/api/restaurants/orders', function (req, res, next) {
+    var user = req.body['user'];
     var obj = {
-       user:user.id,
-        name:user.name,
+        user: user.id,
+        name: user.name,
         address: user.address,
-        cart : user.cart,
-        paymentId : user.paymentId
-   };
+        cart: user.cart,
+        paymentId: user.paymentId
+    };
 
-   Order = new Order(obj);
-   if(obj){
-       Order.save(function (err,docs) {
-           if(err){
-               console.log(err);
-               return res.send(err.message);
-           }
-           return res.send(null,docs);
-       })
-   }
+    Order = new Order(obj);
+    if (obj) {
+        Order.save(function (err, docs) {
+            if (err) {
+                console.log(err);
+                return res.send(err.message);
+            }
+            return res.send(null, docs);
+        })
+    }
 });
-
-
 
 
 // catch 404 and forward to error handler

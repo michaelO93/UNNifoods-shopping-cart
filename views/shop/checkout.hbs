@@ -7,7 +7,15 @@
         <div id="charge-error" class="alert alert-danger{{# if noErrors}}hidden{{/if}}">
             {{errMsg}}
         </div>
-        <form action="/checkout" method="post" id="checkout-form">
+
+        <div class="loadingdiv" style="text-align: center; margin-top: 40px;">
+            <div class="ld-outer">
+                <div class="ld-inner"><img src="/images/preloader.gif"><br><br>
+                    <p><em>Please wait. . .</em></p></div>
+            </div>
+        </div>
+
+        <form action="#" method="post" id="checkout-form">
             <div class="row">
                 <div class="col-xs-12">
                     <div class="form-group">
@@ -31,8 +39,31 @@
 
                 <div class="col-xs-12">
                     <div class="form-group">
+                        <select class="country form-control" name="country" required="">
+                            <option selected="">Country</option>
+                            <option value="NG">Nigeria</option>
+                            <option value="GH">Ghana</option>
+                            <option value="KE">Kenya</option>
+                            <option value="US">USA</option>
+                            <option value="UK">UK</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <select class="form-control" name="currency" required="">
+                            <option value="" selected="" disabled="">Currency</option>
+                        </select>
+                    </div>
+                </div>
+
+
+
+                <div class="col-xs-12">
+                    <div class="form-group">
                         <label for="card-number">Credit Card Number</label>
-                        <input type="text" id="card-number" class="form-control" required>
+                        <input type="text" id="card-number" name="cardno" class="form-control" required>
                     </div>
                 </div>
 
@@ -41,13 +72,13 @@
                         <div class="col-xs-6">
                             <div class="form-group">
                                 <label for="card-expiration-month">Expiration Month</label>
-                                <input type="text" id="card-expiration-month" class="form-control" required>
+                                <input type="text" id="card-month" name="card-month" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-xs-6">
                             <div class="form-group">
                                 <label for="card-expiration-year">Expiration Year</label>
-                                <input type="text" id="card-expiration-year" class="form-control" required>
+                                <input type="text" id="card-year" name="card-year" class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -56,17 +87,128 @@
                 <div class="col-xs-12">
                     <div class="form-group">
                         <label for="card-cvc">CVC</label>
-                        <input type="text" id="card-cvc" class="form-control" required>
+                        <input type="text" id="card-cvc" name="cvv" class="form-control" required>
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-success">Buy Now</button>
+            <div style="margin-bottom: 15px;">
+                <button type="submit" class="btn btn-success">Buy Now</button>
+            </div>
         </form>
     </div>
 </div>
 </div>
 
-<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-<script type="text/javascript" src="javascripts/cart/checkout.js"></script>
+<script>
+    $(document).ready(function () {
+        unspin();
+        function spin() {
+            $('.loadingdiv').show();
+        }
+
+        function unspin() {
+            $('.loadingdiv').hide();
+        }
+
+        $('#checkout-form').on('submit',function (e) {
+            e.preventDefault();
+
+            var ccnumber = $("input[name='cardno']").val(),
+                    ccmonth = $("input[name='card-month']").val(),
+                    ccyear = $("input[name='card-year']").val(),
+                    cvv = $("input[name='cvv']").val(),
+                    country = $("select[name='country']").val(),
+                    currency = $("select[name='currency']").val(),
+                    uniqid = Math.round(+new Date()/1000);
+
+            spin();
+            $.ajax({
+                dataType:'json',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                url:'/checkout',
+                type:'POST',
+                data:JSON.stringify({cardno: ccnumber, expirymonth: ccmonth, expiryyear: ccyear, custid: uniqid, cvv:cvv, currency:currency, country:country}),
+                success:function (response) {
+                    if(response.data.responsecode == '00'){
+                        unspin();
+                        $('#checkout-form')[0].reset();
+                        swal('Payment Successful!','Payment with reference code: '+response.data.transactionreference+' was successful', 'success');
+                        setTimeout(function () {
+                            window.location = '/';
+                        },2000);
+
+                    }if(response.data.responsecode != '00'){
+                        unspin();
+                        swal({
+                            title:"Payment Failure!",
+                            text:'Payment with transaction reference '+'<h5>'+response.data.transactionreference +'  Was Unsuccessful<br></h5><h5><strong>'+response.data.responsemessage+'</strong></h5>',
+                            html:true,
+                            type: "error"
+                        })
+                    }
+                    else if(response.data.responsecode == '02'){
+                        unspin();
+                        swal({
+                            title:'Enter OTP',
+                            text:response.data.responsemessage,
+                            type:'input',
+                            showCancelButton: false,
+                            closeOnConfirm:false,
+                            animation:'slide-from-top',
+                            inputPlaceholder: 'Enter OTP'
+                        },function (inputValue) {
+                            if(inputValue == false) return false;
+                            if(inputValue == ""){
+                                swal.showInputError("You need to write something");
+                                return false;
+                            }
+                            spin();
+                            $.ajax({
+                                url: '/card/verify',
+                                dataType:'json',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
+                                type:'POST',
+                                data:{otp:inputValue,oo:response.data.otptransactionidentifier},
+                                success:function (response) {
+                                    if(response.data.responsecode == '00'){
+                                        unspin();
+                                        swal('Payment Successful!','Payment with reference code: '+response.data.transactionreference+' was successful', 'success');
+                                        $('#checkout-form')[0].reset();
+                                    }else if(response.data.responsecode != '00'){
+                                        unspin();
+                                        swal({
+                                            title:'Info!',
+                                            text: response.data.responsemessage,
+                                            html:true
+                                        })
+                                    }
+                                },error:function (error) {
+                                    if(error){
+                                        unspin();
+                                        swal("Notice","Unable to connect to web service. Try again later","error");
+                                    }
+                                }
+                            })
+                        })
+                    }
+                },error:function (error) {
+                    if(error){
+                        unspin();
+                        swal("Notice","Unable to connect to web service. Check connecttion and try again.","error");
+                    }
+                }
+            })
+        })
+    });
+
+</script>
+
+
+<!--<script type="text/javascript" src="https://js.stripe.com/v2/"></script>-->
+<!--<script type="text/javascript" src="javascripts/cart/checkout.js"></script>-->
 
 

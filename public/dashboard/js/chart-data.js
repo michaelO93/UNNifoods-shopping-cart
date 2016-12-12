@@ -25,7 +25,7 @@ var randomScalingFactor = function(){ return Math.round(Math.random()*1000)};
 				}
 			]
 
-		}
+		};
 		
 	var barChartData = {
 			labels : ["January","February","March","April","May","June","July"],
@@ -46,7 +46,7 @@ var randomScalingFactor = function(){ return Math.round(Math.random()*1000)};
 				}
 			]
 	
-		}
+		};
 
 	var pieData = [
 				{

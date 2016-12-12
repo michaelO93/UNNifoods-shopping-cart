@@ -1,7 +1,7 @@
 var request = require('request');
 require('request-debug')(request);
 
-var baseUrl = process.env.BASE_URL || 'http://localhost:4000/api';
+var baseUrl ='http://localhost:3000/api';
 
 var e = module.exports;
 
@@ -11,6 +11,7 @@ e.restaurant = {
     restaurantCreateProduct : restaurantCreateProduct,
     addRestaurantProductImage: addRestaurantProductImage,
     getRestaurantById: getRestaurantById,
+    getRestaurantProduct : getRestaurantProduct,
     getRestaurantOrders : getRestaurantOrders,
     createOrderForRestaurant:createOrderForRestaurant,
     getOrdersHistory: getRestaurantOrdersHistory,
@@ -41,23 +42,34 @@ function addRestaurantProductImage(data, cb) {
         url: baseUrl +'/restaurants/'+ data.restaurantId + '/products/' + data.productId + '/images',
         form: data.main
     };
-    return request(req, cb);
+    return request(req,cb);
 }
 
 function  restaurantCreateProduct(data, cb) {
     var req  = {
         method :'POST',
         url: baseUrl + '/restaurants/'+ data.restaurantId + '/products',
-        form: data
+        form: data,
+        headers: {
+            'Content-Type':'multipart/form-data'
+        }
     };
     return request(req, cb);
 }
 
+function getRestaurantProduct(data,cb) {
+    var req = {
+        method:'POST',
+        url: baseUrl + '/restaurants/'+ data.restaurantId ,
+        form:data
+    };
+    return request(req,cb)
+}
 function getRestaurantById(id,cb) {
     var req = {
         method:'GET',
-        url: baseUrl + '/restaurants/'+data.restaurantId,
-        form: data
+        url: baseUrl + '/restaurants/'+id
+
     };
     return request(req,cb);
 }

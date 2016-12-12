@@ -37,6 +37,13 @@ router.get('/icons',isLoggedIn,function (req,res) {
     res.render('dashboard/icons');
 });
 
+router.get('/addProduct', isLoggedIn,function (req,res) {
+    res.render('dashboard/menu_add')
+});
+
+router.get('/view_menu', function (req,res,next) {
+    res.render('dashboard/view_menu');
+});
 module.exports = router;
 
 function isLoggedIn(req,res,next) {

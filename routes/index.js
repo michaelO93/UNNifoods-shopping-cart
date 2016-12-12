@@ -5,6 +5,8 @@ var router = express.Router(),
 var Product = require('../models/product');
 var Cart = require('../models/cart'),
     Order = require('../models/order');
+var flutterwave = require("../services/Encryption.js");
+var shopping = require("../services/shoppingservice.js");
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -58,22 +60,53 @@ router.post('/checkout', function (req, res, next) {
     }
     var cart = new Cart(req.session.cart);
 
-    var stripe = require('stripe')('sk_test_HHRxHTKQz4KkjnoRM1zis45u');
 
-    stripe.charges.create({
-        amount: cart.totalPrice * 100,
-        currency: "usd",
-        source: req.body.stripeToken,
-        description: "Example charge"
-    }, function (err, charge) {
-        if (err) {
-            req.flash('error', err.message);
-            res.redirect('/checkout');
+    var data = {
+        "merchantid": process.env.test_merchant_key,
+        "amount": flutterwave.encrypt(process.env.test_api_key, cart.totalPrice ),
+        "cardno": flutterwave.encrypt(process.env.test_api_key, req.body.cardno),
+        "cvv": flutterwave.encrypt(process.env.test_api_key, req.body.cvv),
+        "authmodel": flutterwave.encrypt(process.env.test_api_key, "NOAUTH"),
+        "currency": flutterwave.encrypt(process.env.test_api_key, req.body.currency),
+        "country": flutterwave.encrypt(process.env.test_api_key, req.body.country),
+        "custid": flutterwave.encrypt(process.env.test_api_key,req.body.uniqid),
+        "expirymonth": flutterwave.encrypt(process.env.test_api_key, req.body.expirymonth),
+        "expiryyear": flutterwave.encrypt(process.env.test_api_key, req.body.expiryyear),
+        "narration": flutterwave.encrypt(process.env.test_api_key, "food purchase")
+    };
+
+    console.log(req.body);
+
+    shopping.shopcart(data).then(function (response) {
+        if(response.data.responsecode == '00' || response.data.responsecode == '02'){
+            console.log(response.data);
+            req.flash('success','Successfully bought Product!');
+            req.session.cart = null;
+            return res.json(response);
+        }else if(response.data.responsecode != '00' || response.data.responsecode != '02'){
+            console.log(response.data);
+            return res.json(response);
         }
-        req.flash('success', 'Successfully bought product!');
-        req.session.cart = null;
-        res.redirect('/');
-    })
+    },function (error) {
+        if(error){
+            req.flash('error',error.message);
+            return res.redirect('/checkout');
+        }
+    }).catch(function (error) {
+       console.log(error);
+        return res.redirect('/checkout');
+    });
 });
+
+router.get('/shopping-cart/auth/facebook/',
+    passport.authenticate('facebook.login',{scope:'email'}));
+
+router.get('/shopping-cart/auth/facebook/callback/',
+    passport.authenticate('facebook.login',
+        {
+            successRedirect: '/dashboard',
+            failureRedirect: '/user/signin'
+        })
+);
 
 module.exports = router;

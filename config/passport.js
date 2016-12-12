@@ -8,10 +8,8 @@ var passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
     FacebookStrategy = require('passport-facebook').Strategy;
 
-var sendgrid =require('sendgrid')(process.env.SENDGRID_USERNAME,process.env.SENDGRID_PASSWORD);
+var auth = require("./auth.js");
 
-var appId = '1639529383004359',
-    appSecret = 'ea6ee9d1f5aa01aec320773cd6854b4d';
 
 passport.serializeUser(function (user, done) {
     done(null, user._id);
@@ -76,6 +74,7 @@ passport.use('local.signin', new LocalStrategy({
             });
             return done(null, false, req.flash('error', messages));
         }
+
         User.findOne({'email': email}, function (err, user) {
             if (err) return done(err);
             if (!user) return done(null, false, {message: 'No user found!'});
@@ -85,8 +84,8 @@ passport.use('local.signin', new LocalStrategy({
     }));
 
 passport.use('facebook.login', new FacebookStrategy({
-    clientID: appId,
-    clientSecret: appSecret,
+    clientID: auth.facebook.appId,
+    clientSecret: auth.facebook.appSecret,
     callbackURL: "http://localhost:3000/shopping-cart/auth/facebook/callback/",
     profileFields: ['id', 'email', 'displayName']
 

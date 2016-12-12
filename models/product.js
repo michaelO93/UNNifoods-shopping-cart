@@ -10,7 +10,9 @@ var productSchema = new mongoose.Schema({
     description:{type:String, required:true},
     price:{type:Number, required:true},
     restaurantId:[{type:mongoose.Schema.Types.ObjectId,ref:'restaurant'}],
-    date: {type:Date, default:Date.now}
+    date: {type:Date, default:Date.now},
+    quantity: {type: String,required:true},
+    category : {type:String}
 
 });
 
