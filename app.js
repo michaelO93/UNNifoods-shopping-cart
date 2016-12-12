@@ -22,7 +22,7 @@ dotenv.load({path:'.env'});
 
 var app = express();
 
-mongoose.connect('mongodb://localhost/shopping', function (err, db) {
+mongoose.connect(process.env.MONGODB_URI, function (err, db) {
     if (err) {
         console.log(err);
     } else {
