@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UNNifoods - Dashboard</title>
+
+    <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/dashboard/css/datepicker3.css" rel="stylesheet">
+    <link href="/dashboard/css/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="/dashboard/css/custom.css">
+    <link rel="stylesheet" href="/dashboard/css/fileinput.css">
+
+    <!--Icons-->
+    <script src="/dashboard/js/lumino.glyphs.js"></script>
+    <script src="/dashboard/js/canvas-to-blob.min.js"></script>
+    <script src="/dashboard/js/dropzone.js"></script>
+    <!--<script type="text/javascript" src="//api.filestackapi.com/filestack.js"></script>-->
+    <!--[if lt IE 9]>
+    <script src="/dashboarjs/html5shiv.js"></script>
+    <script src="/dashboard/js/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<!--header-->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#sidebar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><span>UNNifoods</span> Admin</a>
+            <ul class="user-menu">
+                <li class="dropdown pull-right">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <svg class="glyph stroked male-user">
+                            <use xlink:href="#stroked-male-user"></use>
+                        </svg>
+                        User <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">
+                            <svg class="glyph stroked male-user">
+                                <use xlink:href="#stroked-male-user"></use>
+                            </svg>
+                            Profile</a></li>
+                        <li><a href="#">
+                            <svg class="glyph stroked gear">
+                                <use xlink:href="#stroked-gear"></use>
+                            </svg>
+                            Settings</a></li>
+                        <li><a href="#">
+                            <svg class="glyph stroked cancel">
+                                <use xlink:href="#stroked-cancel"></use>
+                            </svg>
+                            Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</nav> <!--end of nav for the header-->
+
+<!--sidebar-->
+<div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar">
+    <form role="search">
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+        </div>
+    </form>
+    <ul class="nav menu">
+        <li><a href="/dashboard">
+            <svg class="glyph stroked dashboard-dial">
+                <use xlink:href="#stroked-dashboard-dial"></use>
+            </svg>
+            Dashboard</a></li>
+        <li><a href="addProduct">
+            <svg class="glyph stroked calendar">
+                <use xlink:href="#stroked-calendar"></use>
+            </svg>
+            Add Menu</a></li>
+        <li class="active"><a href="view_menu">
+            <svg class="glyph stroked line-graph">
+                <use xlink:href="#stroked-line-graph"></use>
+            </svg>
+            View Menu</a></li>
+        <li><a href="tables">
+            <svg class="glyph stroked table">
+                <use xlink:href="#stroked-table"></use>
+            </svg>
+            Orders</a></li>
+        <li><a href="forms">
+            <svg class="glyph stroked pencil">
+                <use xlink:href="#stroked-pencil"></use>
+            </svg>
+            Orders History</a></li>
+        <li><a href="panels">
+            <svg class="glyph stroked app-window">
+                <use xlink:href="#stroked-app-window"></use>
+            </svg>
+            Delivery Provider</a></li>
+        <li><a href="icons">
+            <svg class="glyph stroked star">
+                <use xlink:href="#stroked-star"></use>
+            </svg>
+            Delivery Status</a></li>
+        <li class="parent ">
+            <a href="#">
+                <span data-toggle="collapse" href="#sub-item-1"><svg class="glyph stroked chevron-down"><use
+                        xlink:href="#stroked-chevron-down"></use></svg></span> Dropdown
+            </a>
+            <ul class="children collapse" id="sub-item-1">
+                <li>
+                    <a class="" href="#">
+                        <svg class="glyph stroked chevron-right">
+                            <use xlink:href="#stroked-chevron-right"></use>
+                        </svg>
+                        Sub Item 1
+                    </a>
+                </li>
+                <li>
+                    <a class="" href="#">
+                        <svg class="glyph stroked chevron-right">
+                            <use xlink:href="#stroked-chevron-right"></use>
+                        </svg>
+                        Sub Item 2
+                    </a>
+                </li>
+                <li>
+                    <a class="" href="#">
+                        <svg class="glyph stroked chevron-right">
+                            <use xlink:href="#stroked-chevron-right"></use>
+                        </svg>
+                        Sub Item 3
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li role="presentation" class="divider"></li>
+        <li><a href="/login">
+            <svg class="glyph stroked male-user">
+                <use xlink:href="#stroked-male-user"></use>
+            </svg>
+            Login Page</a></li>
+    </ul>
+
+</div><!--/.sidebar-->
+
+
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+    <div class="row">
+        <ol class="breadcrumb">
+            <li><a href="#">
+                <svg class="glyph stroked home">
+                    <use xlink:href="#stroked-home"></use>
+                </svg>
+            </a></li>
+            <li class="active">Added Menu</li>
+        </ol>
+    </div><!--end of row1-->
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">View Added Product</h1>
+            {{#if success}}
+                <div class="alert alert-success">
+                    {{success}}
+                </div>
+            {{/if}}
+            {{#if errors}}
+                <div class="alert alert-danger">
+                    {{#each errors}}
+                        <p>{{this}}</p>
+                    {{/each}}
+                </div>
+            {{/if}}
+        </div>
+
+    </div><!--end of row2-->
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">Added Product</div>
+                <div class="panel-body">
+                    <form action="/restaurant/getAddedProducts" method="post">
+                        <div class="col-md-6">
+
+                            <!--select restaurant-->
+                            <div class="form-group">
+                                <label class="control-label" for="rest_name">Select Restaurant</label>
+                                <select name="rest_name" id="rest_name" class="form-control">
+                                    <option value="Chitis Foods">Chitis</option>
+                                    <option value="SUB Foods">SUB</option>
+                                    <option value="Halleluyah Foods">Frenzy</option>
+                                    <option value="Malima Foods">Malima</option>
+                                    <option value="Benima Foods">Benima</option>
+                                </select>
+                            </div>
+
+                            <!--submit button-->
+                            <button class="btn btn-primary btn-block" type="submit">Fetch Product</button>
+                        </div>
+                    </form>
+
+                    {{#if products}}
+                        <div class="col-sm-6">
+                            <div class="col-sm-3 col-md-6">
+                                <div class="form-group">
+                                    <label for="product-title" class="control-label">Product Title</label>
+                                    <input type="text" name="product.title" class="form-control" disabled value="{{products.title}}">
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-md-6">
+                                <div class="form-group">
+                                    <label for="product-description" class="control-label">Product Description</label>
+                                    <input type="text" name="product.desc" class="form-control" disabled value="{{products.description}}">
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-md-6">
+                                <div class="form-group">
+                                    <label for="product-quantity" class="control-label">Product Quantity</label>
+                                    <input type="text" name="product.quantity" class="form-control" disabled value="{{products.quantity}}">
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3 col-md-6">
+                                <div class="form-group">
+                                    <label for="product-price" class="control-label">Product Price</label>
+                                    <input type="text" name="product.price" class="form-control" disabled value="{{products.price}}">
+                                </div>
+                            </div>
+
+                            <div style="padding-right: 15px;padding-left: 15px;">
+                                <div class="form-group">
+                                    <label for="product-image" class="control-label">Product Image</label>
+                                    <img src="{{products.imagePath}}" alt="">
+                                </div>
+                            </div>
+                        </div>
+
+                    {{/if}}
+                </div>
+                <div class="panel-footer"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</html>
+
+<script>
+    $(document).ready(function () {
+        if(localStorage.selectVal){
+            $('select').val(localStorage.selectVal)
+        }
+    });
+
+    $('select').on('change',function () {
+        var currentVal = $(this).val();
+        localStorage.setItem('selectVal',currentVal);
+    })
+</script>
