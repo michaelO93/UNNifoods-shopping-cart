@@ -7,6 +7,16 @@ var Cart = require('../models/cart'),
     Order = require('../models/order');
 var flutterwave = require("../services/Encryption.js");
 var shopping = require("../services/shoppingservice.js");
+var q = require('q');
+var dotenv = require('dotenv');
+var createHash = require("crypto").createHash;
+
+dotenv.load({
+    path: '.env'
+});
+
+
+var unirest = require('unirest');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -24,6 +34,65 @@ router.get('/', function (req, res, next) {
     });
 });
 
+router.post('/verify-payment',function(req, res, next){
+    var txref = req.body.txref;
+    var data = {
+        "txref": txref
+    };
+    shopping.verifyPayment(data).then(function(response){
+        return res.json(response)
+    }, 
+    function(error){
+        return res.json(error);
+    });
+});
+
+router.post('/integrity-hash', function (req, res, next) {
+
+    //FLWPUBK-1acc0c234b21839f4ffac462d63beb39-X
+
+    var hashedPayload = '';
+    var payload = {
+        "PBFPubKey": process.env.STAGING_PUBLIC_KEY,
+        "amount": req.body.amount,
+        "payment_method": req.body.payment_method,
+        "custom_description": req.body.custom_description,
+        "custom_logo": req.body.custom_logo,
+        "custom_title": req.body.custom_title,
+        "country": req.body.country,
+        "currency": req.body.currency,
+        "customer_email":req.body.customer_email,
+        "customer_firstname": req.body.customer_firstname,
+        "customer_lastname": req.body.customer_lastname,
+        "customer_phone": req.body.customer_phone,
+        "txref": "MG-" + Date.now()
+    };
+    var keys = Object.keys(payload).sort();
+    for(var index in keys){
+        if (keys.hasOwnProperty(index)) {
+            var key = keys[index];
+            hashedPayload += payload[key];
+        }
+    }
+    var hashedString = hashedPayload + process.env.STAGING_SECKEY;
+    console.log(hashedString);
+
+    var sha256Hash = createHash('sha256').update(hashedString, 'utf8').digest('hex');
+
+    return res.json({hash: sha256Hash, txref: payload.txref});
+});
+
+router.post('/chargeWithToken',function(req, res, next){
+    
+    shopping.chargeWithToken(req.body).then(function(response){
+        return res.json(response)
+    }, 
+    function(error){
+        return res.json(error);
+    });
+});
+
+
 router.get('/add-to-cart/:id', function (req, res, next) {
     var productId = req.params.id;
     var cart = new Cart(req.session.cart ? req.session.cart : {items: {}});
@@ -35,6 +104,20 @@ router.get('/add-to-cart/:id', function (req, res, next) {
         console.log(req.session.cart);
         res.redirect('/');
     })
+});
+
+router.post('/webhook-payment', function(req,res, next){
+
+    var myhash = process.env.MY_HASH;
+    var hash = req.headers["verif-hash"];
+    if(!hash) return;
+    if( hash != myhash) return;
+
+    var response = JSON.parse(req.body);
+    console.log(response);
+
+    return res;
+   
 });
 
 router.get('/shopping-cart', function (req, res, next) {

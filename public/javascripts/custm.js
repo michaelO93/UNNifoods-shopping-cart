@@ -50,6 +50,9 @@ $(document).ready(function() {
         });
     });
 
+    $('.loadingdiv').hide;
+
+
 
 
 });

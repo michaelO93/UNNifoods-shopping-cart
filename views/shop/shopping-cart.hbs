@@ -1,23 +1,31 @@
 {{> header}}
+
+<div class="loadingdiv" style="text-align: center; margin-top: 40px;">
+    <div class="ld-outer">
+        <div class="ld-inner"><img src="/images/preloader.gif"><br><br><p><em>Please wait. . .</em></p>
+        </div>
+    </div>
+</div>
+
 <div class="container">
-{{# if products}}
+    {{# if products}}
     <div class="row">
         <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
             <ul class="list-group">
                 {{# each products}}
-                    <li class="list-group-item">
-                        <span class="badge">{{ this.qty }}</span>
-                        <strong>{{ this.item.title  }}</strong>
-                        <span class="label label-success">${{ this.price }}</span>
-                        <div class="btn-group">
-                            <button class="btn btn-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown">Action <span
-                                    class="caret"></span></button>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Reduce by 1</a></li>
-                                <li><a href="#">Remove All</a></li>
-                            </ul>
-                        </div>
-                    </li>
+                <li class="list-group-item">
+                    <span class="badge">{{ this.qty }}</span>
+                    <strong>{{ this.item.title }}</strong>
+                    <span id="price" class="label label-success">&#8358;{{ this.price }}</span>
+                    <div class="btn-group">
+                        <button class="btn btn-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown">Action
+                            <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Reduce by 1</a></li>
+                            <li><a href="#">Remove All</a></li>
+                        </ul>
+                    </div>
+                </li>
                 {{/each}}
 
             </ul>
@@ -26,20 +34,286 @@
 
     <div class="row">
         <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
-            <strong>Total: ${{ totalPrice }}</strong>
+            <strong id="total-price">Total: ${{ totalPrice }}</strong>
         </div>
     </div>
     <hr>
     <div class="row">
         <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
-            <a href="/checkout" type="button" class="btn btn-success">Checkout</a>
+            <button type="button" id="button-pay" class="btn btn-success">Pay Now</button>
+            <button type="button" id="pay-with-saved-card" class="btn btn-info">Pay with saved card</button>
+
         </div>
     </div>
-{{else}}
+    {{else}}
     <div class="row">
         <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
             <h2>No items in cart</h2>
         </div>
     </div>
-{{/if}}
+    {{/if}}
 </div>
+
+<script type="text/javascript">
+
+    $('.loadingdiv').hide();
+
+    window.localStorage.clear();
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+
+        function makeid() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            for (var i = 0; i < 5; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return "TRXZ-" + text;
+        }
+
+
+        document.getElementById("button-pay").addEventListener("click", function (e) {
+
+            var ramount = "";
+            var hashedData = "";
+            var API_publicKey = "FLWPUBK-1acc0c234b21839f4ffac462d63beb39-X";
+            //var API_publicKey = "FLWPUBK-b282705b5b8c47d7b3c9dcea2c1a168f-X";
+
+            //const API_publicKey = "FLWPUBK-10387a3e3f6ea2be86feea7ce9a442b4-X";//live
+            var price = document.getElementById('total-price').innerHTML;
+            var pricef = price.split('$');
+            var txref, subaccounts;
+
+            this.amount = pricef[1];
+            ramount = this.amount;
+
+            //purpose of hashing
+            var hashingData = {
+                PBFPubKey: "FLWPUBK-1acc0c234b21839f4ffac462d63beb39-X",
+                amount: ramount,
+                payment_method:"both",
+                custom_description: "payme",
+                custom_logo: "https://image.ibb.co/dLg6AU/Screen_Shot_2018_09_13_at_5_14_40_PM.png",
+                custom_title: "PayMe",
+                country: "NG",
+                currency: "NGN",
+                customer_email: "michaelonyeforo112@gmail.com",
+                customer_firstname: "Michael",
+                customer_lastname: "Onyx",
+                customer_phone: "234099940409"
+            };
+
+            $.ajax({
+                url: '/integrity-hash',
+                method: 'POST',
+                type: 'json',
+                data: hashingData,
+                success: function (response) {
+                    hashedData = response.hash;
+                    txref = response.txref;
+                    console.log(response);
+
+                    var x = getpaidSetup({
+                        PBFPubKey: "FLWPUBK-1acc0c234b21839f4ffac462d63beb39-X",
+                        amount: ramount,
+                        payment_method:"both",
+                        custom_description: "payme",
+                        custom_logo: "https://image.ibb.co/dLg6AU/Screen_Shot_2018_09_13_at_5_14_40_PM.png",
+                        custom_title: "PayMe",
+                        country: "NG",
+                        currency: "NGN",
+                        customer_email: "michaelonyeforo112@gmail.com",
+                        customer_firstname: "Michael",
+                        customer_lastname: "Onyx",
+                        customer_phone: "234099940409",
+                        txref: txref,
+                        integrity_hash : hashedData,
+                        subaccounts: [
+                            {
+                                id: "RS_46B12998CFDF3692C1E50602DA886164",
+                                transaction_charge: "0.67"
+                            }
+                        ],
+                        onclose: function () {
+                            console.log('closure here')
+                        },
+                        callback: function (response) {
+
+                            console.log(response);
+
+                            var flw_ref = response.tx.flwRef;
+
+                            //saving a card
+                            var new_data;
+
+                            if (response.tx.hasOwnProperty('chargeToken')) {
+                                new_data = {
+                                    country: "NG",
+                                    txRef: response.tx.txRef,
+                                    IP: response.tx.IP,
+                                    currency: response.tx.currency,
+                                    token: response.tx.chargeToken.embed_token
+                                }
+                                //  console.log('saved data: ', JSON.stringify(new_data))
+
+                                // window.localStorage.setItem("card-requirement", JSON.stringify(new_data));
+
+                            }
+
+
+                            if (response.tx.chargeResponseCode === '00' || response.tx.chargeResponseCode === '0') {
+                                // redirect to a success page
+                                $.ajax({
+                                    url: '/verify-payment',
+                                    method: 'POST',
+                                    type: 'json',
+                                    data: { txref: response.tx.txRef },
+                                    success: function (response) {
+                                        console.log("payment verified: ", response);
+
+                                        if (response.hasOwnProperty('card')) {
+
+                                            new_data.email = response.custemail;
+                                            new_data.firstname = response.custname.split(' ')[0];
+                                            new_data.lastname = response.custname.split(' ')[1];
+                                            new_data.amount = response.amount;
+
+                                            console.log('saved data: ', JSON.stringify(new_data));
+
+                                            window.localStorage.setItem("card-requirement", JSON.stringify(new_data));
+
+                                        }
+
+
+                                        if (response.chargecode === "00" && response.amount.toString() === ramount) {
+                                            x.close();
+                                            swal('Hurray!', 'value given, get out of here!', 'success');
+                                        }
+                                        else {
+                                            alert('something broke!');
+                                        }
+
+                                        var cardDetails;
+                                        if (response.hasOwnProperty('card')) {
+                                            cardDetails = {
+                                                cardExpiryMonth: response.card.expirymonth,
+                                                cardExpiryYear: response.card.expiryyear,
+                                                cardBin: response.card.cardBIN,
+                                                last4digits: response.card.last4digits,
+                                                brand: response.card.brand,
+                                                mToken: response.card.card_tokens['embedtoken'],
+                                                token: response.card.life_time_token
+                                            };
+                                            console.log('saved-card:', cardDetails);
+
+                                            window.localStorage.setItem('cardDetails', JSON.stringify(cardDetails));
+
+                                        }
+
+                                    },
+                                    error: function (error) {
+                                        console.log(error);
+                                    }
+
+                                })
+
+                            }
+                            else {
+                                // redirect to a failure page.
+                            }
+                        }
+                    });
+
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        });
+
+        function spin() {
+            $('.loadingdiv').show();
+        }
+
+        function unspin() {
+            $('.loadingdiv').hide();
+
+        }
+
+        document.getElementById("pay-with-saved-card").addEventListener("click", function (e) {
+            e.preventDefault();
+
+            var card_req = window.localStorage.getItem('card-requirement');
+            card_req = JSON.parse(card_req);
+
+            console.log(card_req);
+
+            var card_details = window.localStorage.getItem('cardDetails');
+            card_details = JSON.parse(card_details);
+
+            if (card_details == null && card_req == null) {
+                alert('Please make a payment first with a card to save for later. Use \'Pay Now\'');
+                return;
+            }
+
+            card_req["token"] = card_details.token;
+            card_req.subaccounts = [
+                {
+                    id: "RS_46B12998CFDF3692C1E50602DA886164",
+                    transaction_charge: "0.67"
+                }
+
+                // {
+                //     id: "RS_64DC28E356E84E1D00FFF551EF49983D",
+                //     transaction_split_ratio: "3",
+                //     transaction_charge_type: "flat",
+                //     transaction_charge: "20"
+                // }
+                ];
+
+
+            console.log('card-req: ', card_req);
+
+            spin();
+
+            $.ajax({
+                url: '/chargeWithToken',
+                method: 'post',
+                dataType: 'json',
+                data: card_req,
+                success: function (response) {
+                    console.log("token payment", response);
+                    $.ajax({
+                        url: '/verify-payment',
+                        method: 'POST',
+                        type: 'json',
+                        data: { txref: response.txRef },
+                        success: function (response) {
+                            unspin();
+                            console.log("payment verified 2: ", response);
+                            if (response.chargecode === "00") {
+                                swal("Yah!", response.status, "success")
+                            } else {
+                                swal("Error", response.message, "error");
+                            }
+
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+
+                    })
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        });
+
+
+    });
+
+
+</script> {{!--
+<script type="text/javascript" src="https://api.ravepay.co/flwv3-pug/getpaidx/api/flwpbf-inline.js"></script> --}}
+<script type="text/javascript" src="https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/flwpbf-inline.js"></script>

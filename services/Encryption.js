@@ -5,6 +5,9 @@ var CryptoJS = require('crypto-js'),
     forge = require('node-forge'),
     utf8 = require('utf8');
 
+var  dotenv = require('dotenv');
+dotenv.load({path:'.env'});
+
 module.exports = {
 
     encrypt: function (key, text) {
@@ -17,5 +20,34 @@ module.exports = {
         cipher.finish();
         var encrypted = cipher.output;
         return ( forge.util.encode64(encrypted.getBytes()) );
+    },
+
+    integrityValue: function (req,res) {
+        var hashedPayload = '';
+        var payload = {
+            PBFPubKey: "FLWPUBK-1acc0c234b21839f4ffac462d63beb39-X",
+            customer_email: "michaelonyeforo112@gmail.com",
+            customer_firstname: "Temi",
+            customer_lastname: "Adelewa",
+            custom_logo: "https://image.ibb.co/dLg6AU/Screen_Shot_2018_09_13_at_5_14_40_PM.png",
+            amount: 20,
+            customer_phone: "234099940409",
+            country: "NG",
+            currency: "NGN",
+            txref: "MG-" + Date.now()
+        };
+            var keys = Object.keys(payload).sort();
+            for(var index in keys){
+                if (keys.hasOwnProperty(index)) {
+                    var key = keys[index];
+                    hashedPayload += payload[key];
+                }
+            }
+
+            var hashedString = hashedPayload + process.env.STAGING_SECKEY;
+
+        var sha256Hash = createHash(hashedString).digest().hex('');
+
+        res.json({hash: sha256Hash, txref: payload.txref});
     }
 };

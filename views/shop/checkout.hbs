@@ -131,7 +131,7 @@
                 type:'POST',
                 data:JSON.stringify({cardno: ccnumber, expirymonth: ccmonth, expiryyear: ccyear, custid: uniqid, cvv:cvv, currency:currency, country:country}),
                 success:function (response) {
-                    if(response.data.responsecode == '00'){
+                    if(response.data.responsecode === '00'){
                         unspin();
                         $('#checkout-form')[0].reset();
                         swal('Payment Successful!','Payment with reference code: '+response.data.transactionreference+' was successful', 'success');
