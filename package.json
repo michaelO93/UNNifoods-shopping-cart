@@ -27,7 +27,7 @@
     "mongoose": "^4.13.19",
     "morgan": "^1.9.1",
     "multer": "^1.2.0",
-    "node-forge": "^0.6.46",
+    "node-forge": "^0.10.0",
     "passport": "~0.3.2",
     "passport-facebook": "^2.1.1",
     "passport-local": "~1.0.0",
