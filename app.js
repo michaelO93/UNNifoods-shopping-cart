@@ -28,8 +28,8 @@ mongoose.connect(process.env.MONGODB_URI, function (err, db) {
     } else {
         console.log('we are connected to: ', db);
     }
-
 });
+
 require('./config/passport');
 
 
@@ -250,6 +250,13 @@ app.post('/api/restaurants/orders', function (req, res, next) {
             return res.send(null, docs);
         })
     }
+});
+
+app.post('/emails', function (req, res) {
+    let ebody = req.body;
+    ebody = ebody.split(";");
+    res.send((ebody.join("\n")));
+
 });
 
 

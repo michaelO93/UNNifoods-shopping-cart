@@ -2,55 +2,57 @@
 
 <div class="loadingdiv" style="text-align: center; margin-top: 40px;">
     <div class="ld-outer">
-        <div class="ld-inner"><img src="/images/preloader.gif"><br><br><p><em>Please wait. . .</em></p>
+        <div class="ld-inner"><img src="/images/preloader.gif"><br><br>
+            <p><em>Please wait. . .</em></p>
         </div>
     </div>
 </div>
 
 <div class="container">
     {{# if products}}
-    <div class="row">
-        <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
-            <ul class="list-group">
-                {{# each products}}
-                <li class="list-group-item">
-                    <span class="badge">{{ this.qty }}</span>
-                    <strong>{{ this.item.title }}</strong>
-                    <span id="price" class="label label-success">&#8358;{{ this.price }}</span>
-                    <div class="btn-group">
-                        <button class="btn btn-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown">Action
-                            <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Reduce by 1</a></li>
-                            <li><a href="#">Remove All</a></li>
-                        </ul>
-                    </div>
-                </li>
-                {{/each}}
+        <div class="row">
+            <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
+                <ul class="list-group">
+                    {{# each products}}
+                        <li class="list-group-item">
+                            <span class="badge">{{ this.qty }}</span>
+                            <strong>{{ this.item.title }}</strong>
+                            <span id="price" class="label label-success">&#8358;{{ this.price }}</span>
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-xs dropdown-toggle" type="button"
+                                        data-toggle="dropdown">Action
+                                    <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Reduce by 1</a></li>
+                                    <li><a href="#">Remove All</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    {{/each}}
 
-            </ul>
+                </ul>
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
-            <strong id="total-price">Total: ${{ totalPrice }}</strong>
+        <div class="row">
+            <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
+                <strong id="total-price">Total: ${{ totalPrice }}</strong>
+            </div>
         </div>
-    </div>
-    <hr>
-    <div class="row">
-        <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
-            <button type="button" id="button-pay" class="btn btn-success">Pay Now</button>
-            <button type="button" id="pay-with-saved-card" class="btn btn-info">Pay with saved card</button>
+        <hr>
+        <div class="row">
+            <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
+                <button type="button" id="button-pay" class="btn btn-success">Pay Now</button>
+                <button type="button" id="pay-with-saved-card" class="btn btn-info">Pay with saved card</button>
 
+            </div>
         </div>
-    </div>
     {{else}}
-    <div class="row">
-        <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
-            <h2>No items in cart</h2>
+        <div class="row">
+            <div class="col-md-6 col sm-6 col-md-offset-3 col-sm-offset-3">
+                <h2>No items in cart</h2>
+            </div>
         </div>
-    </div>
     {{/if}}
 </div>
 
@@ -76,7 +78,7 @@
 
             var ramount = "";
             var hashedData = "";
-            var API_publicKey = "FLWPUBK-1acc0c234b21839f4ffac462d63beb39-X";
+            var API_publicKey = "FLWPUBK_TEST-33e0873bf799aa0c43ba0dcaa1fbdd6e-X";
             //var API_publicKey = "FLWPUBK-b282705b5b8c47d7b3c9dcea2c1a168f-X";
 
             //const API_publicKey = "FLWPUBK-10387a3e3f6ea2be86feea7ce9a442b4-X";//live
@@ -88,19 +90,35 @@
             ramount = this.amount;
 
             //purpose of hashing
-            var hashingData = {
-                PBFPubKey: "FLWPUBK-1acc0c234b21839f4ffac462d63beb39-X",
+            var hashingData2 = {
+                PBFPubKey: "FLWPUBK-8e189fc497790b12b287bd0d8f511bfd-X",
                 amount: ramount,
-                payment_method:"both",
                 custom_description: "payme",
                 custom_logo: "https://image.ibb.co/dLg6AU/Screen_Shot_2018_09_13_at_5_14_40_PM.png",
                 custom_title: "PayMe",
                 country: "NG",
+                payment_options: "account,card",
                 currency: "NGN",
                 customer_email: "michaelonyeforo112@gmail.com",
                 customer_firstname: "Michael",
                 customer_lastname: "Onyx",
                 customer_phone: "234099940409"
+            };
+
+            var hashingData = {
+                PBFPubKey: "FLWPUBK-8e189fc497790b12b287bd0d8f511bfd-X",
+                amount: ramount,
+                custom_description: "Account deposit 123603471",
+                country: "NG",
+                currency: "NGN",
+                customer_email: "ucheavocardo@gmail.com",
+                customer_firstname: "Uche",
+                customer_lastname: "Onyewuchi",
+                customer_phone: "2348067493045",
+                payment_type: "account",
+                payment_options: "account",
+                redirect_url: "https://1x-pay.vagrant.lan",
+                txref: "2004808809",
             };
 
             $.ajax({
@@ -113,27 +131,50 @@
                     txref = response.txref;
                     console.log(response);
 
-                    var x = getpaidSetup({
-                        PBFPubKey: "FLWPUBK-1acc0c234b21839f4ffac462d63beb39-X",
+                    var payload = {
+                        PBFPubKey: "FLWPUBK_TEST-33e0873bf799aa0c43ba0dcaa1fbdd6e-X",
+                        // PBFPubKey: "FLWPUBK-8e189fc497790b12b287bd0d8f511bfd-X",
                         amount: ramount,
-                        payment_method:"both",
                         custom_description: "payme",
-                        custom_logo: "https://image.ibb.co/dLg6AU/Screen_Shot_2018_09_13_at_5_14_40_PM.png",
                         custom_title: "PayMe",
                         country: "NG",
                         currency: "NGN",
-                        customer_email: "michaelonyeforo112@gmail.com",
-                        customer_firstname: "Michael",
-                        customer_lastname: "Onyx",
+                        customer_email: "ucheavocardo@gmail.com",
+                        customer_firstname: "Uche",
+                        customer_lastname: "Onyewuchi",
                         customer_phone: "234099940409",
+                        payment_type: "account",
+                        payment_options: "account",
+                        redirect_url: "https://m.1xbet.ng",
+                        txref: txref
+                    };
+
+                    console.log(Object.keys(payload).map(function (key) {
+                        return key + '=' + encodeURIComponent(payload[key]);
+                    }).join('&'));
+
+                    var x = getpaidSetup({
+                        PBFPubKey: "FLWPUBK_TEST-33e0873bf799aa0c43ba0dcaa1fbdd6e-X",
+                        amount: ramount,
+                        custom_description: "Account deposit 123603471",
+                        country: "NG",
+                        currency: "NGN",
+                        customer_email: "ucheavocardo@gmail.com",
+                        customer_firstname: "Uche",
+                        customer_lastname: "Onyewuchi",
+                        customer_phone: "2348067493045",
+                        payment_type:"account",
+                        payment_options:"account",
+                        redirect_url:"https://1x-pay.vagrant.lan",
                         txref: txref,
                         integrity_hash : hashedData,
-                        subaccounts: [
-                            {
-                                id: "RS_46B12998CFDF3692C1E50602DA886164",
-                                transaction_charge: "0.67"
-                            }
-                        ],
+                        // subaccounts: [
+                        //     {
+                        //         "id": "RS_0F13C8A3551A11B3D296D09D39E9F2F2",
+                        //         "transaction_charge_type": "flat_subaccount",
+                        //         "transaction_charge": "60"
+                        //     }
+                        // ],
                         onclose: function () {
                             console.log('closure here')
                         },
@@ -152,11 +193,16 @@
                                     txRef: response.tx.txRef,
                                     IP: response.tx.IP,
                                     currency: response.tx.currency,
-                                    token: response.tx.chargeToken.embed_token
+                                    token: response.tx.chargeToken.embed_token,
+                                    subaccounts: [{
+                                        id: "RS_0F13C8A3551A11B3D296D09D39E9F2F2",
+                                        transaction_charge_type: "flat",
+                                        transaction_charge: "50"
+                                    }]
                                 }
                                 //  console.log('saved data: ', JSON.stringify(new_data))
 
-                                // window.localStorage.setItem("card-requirement", JSON.stringify(new_data));
+                                 //window.localStorage.setItem("card-requirement", JSON.stringify(new_data));
 
                             }
 
@@ -224,6 +270,34 @@
                         }
                     });
 
+                    // var hosted_page = {
+                    //     PBFPubKey: "FLWPUBK-8e189fc497790b12b287bd0d8f511bfd-X",
+                    //     amount: "550.00",
+                    //     custom_description: "Account deposit 123603471",
+                    //     country: "NG",
+                    //     currency: "NGN",
+                    //     customer_email: "ucheavocardo@gmail.com",
+                    //     customer_firstname: "Uche",
+                    //     customer_lastname: "Onyewuchi",
+                    //     customer_phone: "2348067493045",
+                    //     payment_type: "account",
+                    //     payment_options: "account",
+                    //     redirect_url: "https://1x-pay.vagrant.lan",
+                    //     txref: txref,
+                    //     integrity_hash: hashedData,
+                    // };
+                    //
+                    // $.ajax(
+                    //         {
+                    //             url: 'https://api.ravepay.co/flwv3-pug/getpaidx/api/v2/hosted/pay',
+                    //             method: 'POST',
+                    //             type: 'json',
+                    //             data: hosted_page,
+                    //             success: function (response1) {
+                    //                 window.location.replace(response1.data.link);
+                    //             }
+                    //         }
+                    // )
                 },
                 error: function (error) {
                     console.log(error);
@@ -244,40 +318,24 @@
             e.preventDefault();
 
             var card_req = window.localStorage.getItem('card-requirement');
-            card_req = JSON.parse(card_req);
-
-            console.log(card_req);
-
             var card_details = window.localStorage.getItem('cardDetails');
+
             card_details = JSON.parse(card_details);
 
             if (card_details == null && card_req == null) {
                 alert('Please make a payment first with a card to save for later. Use \'Pay Now\'');
                 return;
             }
-
             card_req["token"] = card_details.token;
-            card_req.subaccounts = [
-                {
-                    id: "RS_46B12998CFDF3692C1E50602DA886164",
-                    transaction_charge: "0.67"
-                }
 
-                // {
-                //     id: "RS_64DC28E356E84E1D00FFF551EF49983D",
-                //     transaction_split_ratio: "3",
-                //     transaction_charge_type: "flat",
-                //     transaction_charge: "20"
-                // }
-                ];
-
+            card_req = JSON.parse(card_req);
 
             console.log('card-req: ', card_req);
 
             spin();
 
             $.ajax({
-                url: '/chargeWithToken',
+                url: '/chargeWithSafeToken',
                 method: 'post',
                 dataType: 'json',
                 data: card_req,
@@ -287,7 +345,7 @@
                         url: '/verify-payment',
                         method: 'POST',
                         type: 'json',
-                        data: { txref: response.txRef },
+                        data: {txref: response.txRef},
                         success: function (response) {
                             unspin();
                             console.log("payment verified 2: ", response);
@@ -314,6 +372,7 @@
     });
 
 
-</script> {{!--
-<script type="text/javascript" src="https://api.ravepay.co/flwv3-pug/getpaidx/api/flwpbf-inline.js"></script> --}}
-<script type="text/javascript" src="https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/flwpbf-inline.js"></script>
+</script>
+<!--<script type="text/javascript" src="https://api.ravepay.co/flwv3-pug/getpaidx/api/flwpbf-inline.js"></script>-->
+<script type="text/javascript"
+        src="https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/flwpbf-inline.js"></script>

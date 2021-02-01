@@ -5,8 +5,8 @@ var express = require('express');
 var router = express.Router();
 var apiRequests = require('../api');
 
-var RestModel = require('../models/restaurant'),
-    CategoryModel = require('../models/category-menu'),
+const RestModel = require('../models/restaurant'),
+    // CategoryModel = require('../models/category-menu'),
     ProductModel = require('../models/product');
 
 var fs = require("fs"),

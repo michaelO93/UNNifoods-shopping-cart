@@ -36,7 +36,8 @@ module.exports = {
 
     verifyPayment: function (data) {
         var d = q.defer();
-        data.SECKEY = "FLWSECK-09ed20c3fef6f2f252bdc32c92a88673-X"; // staging
+        // data.SECKEY = "FLWSECK-09ed20c3fef6f2f252bdc32c92a88673-X"; // staging
+        data.SECKEY = process.env.STAGING_SECKEY;
         // data.SECKEY = "FLWSECK-1aa12cba44ea57b2c9d49d23842e7197-X"; // live
         //https://api.ravepay.co/flwv3-pug/getpaidx/api/v2/verify
         unirest.post(process.env.VERIFY_STAGING+'')
@@ -56,12 +57,35 @@ module.exports = {
 
     chargeWithToken: function (data) {
         var d = q.defer();
-        data.SECKEY = "FLWSECK-09ed20c3fef6f2f252bdc32c92a88673-X"; //staging
+        data.SECKEY = process.env.STAGING_SECKEY; //staging
+        console.log(data);
+        var subaccounts ={
+
+        };
 
         //data.SECKEY = "FLWSECK-1aa12cba44ea57b2c9d49d23842e7197-X"; // live
 // 
 // https://api.ravepay.co/flwv3-pug/getpaidx/api/tokenized/charge
         unirest.post(process.env.TOKENIZED_STAGING+'')
+            .headers({
+                'Content-Type': 'application/json'
+            })
+            .send(data)
+            .end(function (response) {
+                if (response.body.status === "success") {
+                    d.resolve(response.body.data);
+                }
+                d.reject(response.body.data);
+            });
+        return d.promise;
+    },
+
+    chargeWithSafeToken: function (data) {
+        var d = q.defer();
+        data.SECKEY = process.env.STAGING_SECKEY; //staging
+        console.log(data);
+
+        unirest.post("https://ravesandboxapi.flutterwave.com/v2/gpx/cards/tokenize")
             .headers({
                 'Content-Type': 'application/json'
             })

@@ -1,0 +1,222 @@
+{{>header}}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 col-md-4 col-md-offset-4 col sm-offset-4">
+            <h1>Transfer</h1>
+            <!--<h4><strong>Your Total: ${{total}}</strong></h4>-->
+            <!--<div id="charge-error" class="alert alert-danger{{# if noErrors}}hidden{{/if}}">-->
+            <!--{{errMsg}}-->
+            <!--</div>-->
+
+            <div class="loadingdiv" style="text-align: center; margin-top: 40px;">
+                <div class="ld-outer">
+                    <div class="ld-inner"><img src="/images/preloader.gif"><br><br>
+                        <p><em>Please wait. . .</em></p></div>
+                </div>
+            </div>
+
+            <form action="#" method="post" id="checkout-form">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label for="name">Amount</label>
+                            <input type="text" id="amount" class="form-control" required name="amount">
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label for="address">Narration</label>
+                            <input type="text" id="narration" class="form-control" required name="narration">
+                        </div>
+                    </div>
+
+
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <select class="country form-control" name="country" required="">
+                                <option selected="">Country</option>
+                                <option value="NG">Nigeria</option>
+                                <option value="GH">Ghana</option>
+                                <option value="KE">Kenya</option>
+                                <option value="US">USA</option>
+                                <option value="UK">UK</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <select class="form-control" name="currency" required="">
+                                <option value="" selected="" disabled="">Currency</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label for="banks" class="sr-only">Bank</label>
+                            <select name="banks" class="form-control" id="banky">
+                                <option value="" selected="" disabled="">Bank</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label for="reg_password" class="sr-only">Account Number</label>
+                            <input style="padding-left:10px" type="text" class="firs form-control" id="accta"
+                                   name="accountnumber" placeholder="Account Number"/>
+                        </div>
+                    </div>
+
+
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label for="recipient_name" class="lable hidden">Recipient</label>
+                            <input type="text" id="recipient_name" name="recipient_name" class="form-control hidden"
+                                                                       required>
+                        </div>
+                    </div>
+
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <button type="submit" class="btn btn-success">Send Money</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+       var selectedCountry;
+        unspin();
+
+        function spin() {
+            $('.loadingdiv').show();
+        }
+
+        function unspin() {
+            $('.loadingdiv').hide();
+        }
+
+        $(function () {
+            $('select[name="country"]').change(function () {
+                country = $('select[name="country"]').val();
+                $('select[name="banks"]').html('');
+                populateBanks();
+            });
+        });
+
+        function populateBanks() {
+            selectedCountry = $('select[name="country"]').val(),
+                    append = '<option value="" selected disabled>Select Bank</option>';
+
+            countrySelected = "?country=" + selectedCountry;
+
+            if (selectedCountry === "GH") {
+                $('#accta').attr('placeholder', "Bank Account or Phone Number");
+            } else {
+                $('#accta').attr('placeholder', "Account Number");
+            }
+
+
+            if (selectedCountry) {
+                $('#spin-let').show();
+                $.ajax({
+                    dataType: "json",
+                    url: "https://moneywave.herokuapp.com/v1/banks/" + countrySelected,
+                    type: "POST",
+                    success: function (response) {
+                        $('#spin-let').hide();
+                        var $select = $('#banky');
+                        $.each(response.data, function (key, value) {
+                            append += '<option value="' + key + '">' + value + '</option>';
+                        });
+                        $('select[name="banks"]').html(append);
+
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    }
+                });
+            } else {
+                $("#banky option:selected").attr('disabled', 'disabled')
+                        .siblings().removeAttr('disabled');
+            }
+        }
+
+
+        // currency = (selectedCountry === "NG") ? "NGN" : "GHS";
+
+        function delay(callback, ms){
+            var timer  = 0;
+            return function () {
+                var context = this.args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    callback.apply(context, arguments)
+                }, ms || 0);
+            }
+        }
+
+
+
+
+        $('#accta').keyup(delay(function () {
+            var data = {
+                "account_number": $('#accta').val(),
+                "bank_code":  $('#banky').val(),
+                "currency": "NGN"
+            };
+            console.log(data);
+            spin();
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: '/resolve/account',
+                success: function (response) {
+                    unspin();
+                    if (response.status === 'success') {
+                        $('#recipient_name').removeClass('hidden').val(response.data.account_name)
+                                .attr('disabled', 'disabled');
+                        $('.lable').removeClass('hidden');
+                    } else {
+                        alert(response.message || response.msg);
+                        unspin();
+                    }
+
+                },
+                error: function () {
+                    alert('Oops! An error occurred!, Try again!');
+                    unspin();
+                }
+            });
+        }, 2000));
+
+
+
+        $('#checkout-form').on('submit', function (e) {
+            e.preventDefault();
+
+            var ccnumber = $("input[name='cardno']").val(),
+                    ccmonth = $("input[name='card-month']").val(),
+                    ccyear = $("input[name='card-year']").val(),
+                    cvv = $("input[name='cvv']").val(),
+                    country = $("select[name='country']").val(),
+                    currency = $("select[name='currency']").val(),
+                    uniqid = Math.round(+new Date() / 1000);
+
+            spin();
+
+        })
+    });
+
+</script>
+
+
+<!--<script type="text/javascript" src="https://js.stripe.com/v2/"></script>-->
+<!--<script type="text/javascript" src="javascripts/cart/checkout.js"></script>-->
+
+

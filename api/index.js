@@ -1,112 +1,16 @@
-var request = require('request');
-require('request-debug')(request);
+var moneywave = require("../api/transfer");
 
-var baseUrl ='http://localhost:3000/api';
+module.exports = {
+    accountNumberValidation: function (req, res) {
 
-var e = module.exports;
+        moneywave.accountNumberValidation(req).then(function (response) {
+            return res.json(response);
 
-e.restaurant = {
-    createRestaurant: createRestaurant,
-    createRestaurantAddress: addRestaurantAddr,
-    restaurantCreateProduct : restaurantCreateProduct,
-    addRestaurantProductImage: addRestaurantProductImage,
-    getRestaurantById: getRestaurantById,
-    getRestaurantProduct : getRestaurantProduct,
-    getRestaurantOrders : getRestaurantOrders,
-    createOrderForRestaurant:createOrderForRestaurant,
-    getOrdersHistory: getRestaurantOrdersHistory,
-    getAllOrders: getAllOrders
+        }).catch(function (error) {
+            if (error) {
+                console.log(error);
+                return res.json(error);
+            }
+        })
+    }
 };
-
-function createRestaurant(restaurant, cb) {
-    var req = {
-        method: 'POST',
-        url: baseUrl + '/restaurants',
-        form: restaurant
-    };
-    return request(req, cb);
-}
-
-function addRestaurantAddr(restaurant,address, cb) {
-    var req= {
-        method: 'POST',
-        url: baseUrl + '/restaurants/'+ restaurant + '/addresses',
-        form: address
-    };
-    return request(req, cb);
-}
-
-function addRestaurantProductImage(data, cb) {
-    var req = {
-        method:'POST',
-        url: baseUrl +'/restaurants/'+ data.restaurantId + '/products/' + data.productId + '/images',
-        form: data.main
-    };
-    return request(req,cb);
-}
-
-function  restaurantCreateProduct(data, cb) {
-    var req  = {
-        method :'POST',
-        url: baseUrl + '/restaurants/'+ data.restaurantId + '/products',
-        form: data,
-        headers: {
-            'Content-Type':'multipart/form-data'
-        }
-    };
-    return request(req, cb);
-}
-
-function getRestaurantProduct(data,cb) {
-    var req = {
-        method:'POST',
-        url: baseUrl + '/restaurants/'+ data.restaurantId ,
-        form:data
-    };
-    return request(req,cb)
-}
-function getRestaurantById(id,cb) {
-    var req = {
-        method:'GET',
-        url: baseUrl + '/restaurants/'+id
-
-    };
-    return request(req,cb);
-}
-
-function getRestaurantOrders(data,cb) {
-    var req = {
-        method:'GET',
-        url: baseUrl + '/restaurants/'+data.restaurantId +'/orders'
-    };
-    return request(req,cb);
-}
-
-function createOrderForRestaurant(orders,cb) {
-    var req={
-        method:'POST',
-        url:baseUrl + '/restaurants/:restaurantId/orders/:orderId',
-        params:{
-            restaurantId: '@restaurantId',
-            orderId:'@orderId'
-        }
-    };
-    return request(req,cb);
-}
-
-function getRestaurantOrdersHistory(data, cb) {
-    var req ={
-        method:'GET',
-        url:baseUrl + '/restaurants/ordersHistory',
-        form:data
-    };
-    return request(req,cb);
-}
-
-function getAllOrders(cb) {
-    var req = {
-        method:'GET',
-        url : baseUrl + '/restaurants/getOrders'
-    };
-    return request(req,cb);
-}

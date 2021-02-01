@@ -25,7 +25,7 @@ module.exports = {
     integrityValue: function (req,res) {
         var hashedPayload = '';
         var payload = {
-            PBFPubKey: "FLWPUBK-1acc0c234b21839f4ffac462d63beb39-X",
+            PBFPubKey: "FLWPUBK-8e189fc497790b12b287bd0d8f511bfd-X",
             customer_email: "michaelonyeforo112@gmail.com",
             customer_firstname: "Temi",
             customer_lastname: "Adelewa",
