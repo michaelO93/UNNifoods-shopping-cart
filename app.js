@@ -1,26 +1,26 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var expressHsb = require('express-handlebars');
-var mongoose = require('mongoose');
-var session = require('express-session');
-var passport = require('passport');
-var flash = require('connect-flash');
-var multer = require('multer');
-var validator = require('express-validator');
-var MongoStore = require('connect-mongo/es5')(session);
-
-var routes = require('./routes/index');
-var userRoutes = require('./routes/user');
-var apiRestaurant = require('./routes/restaurant');
-var adminDashboard = require('./routes/dashboard');
-var  dotenv = require('dotenv');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const expressHsb = require('express-handlebars');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const passport = require('passport');
+const flash = require('connect-flash');
+const multer = require('multer');
+const validator = require('express-validator');
+const routes = require('./routes/index');
+const userRoutes = require('./routes/user');
+const apiRestaurant = require('./routes/restaurant');
+const adminDashboard = require('./routes/dashboard');
+const dotenv = require('dotenv');
 dotenv.load({path:'.env'});
+const MongoStore = require('connect-mongo/es5')(session);
 
-var app = express();
+
+const app = express();
 
 mongoose.connect(process.env.MONGODB_URI, function (err, db) {
     if (err) {
@@ -73,28 +73,28 @@ app.get("https://polar-tundra-70244.herokuapp.com/1mp311b1", function(request, r
  * here to log the signature and body to db or file       */
 
    console.log("Webhook Response: ", request);
-  
+
   // retrieve the signature from the header
   var hash = req.headers["verif-hash"];
-  
+
   if(!hash) {
-  	// discard the request,only a post with rave signature header gets our attention 
+  	// discard the request,only a post with rave signature header gets our attention
   }
-  
+
   // Get signature stored as env variable on your server
   var secret_hash = process.env.MY_HASH;
-  
+
   // check if signatures match
-  
+
   if(hash !== secret_hash) {
    // silently exit, or check that you are passing the write hash on your server.
   }
-  
+
   // Retrieve the request's body
   var request_json = JSON.parse(request.body);
 
   // Give value to your customer but don't give any output
-// Remember that this is a call from rave's servers and 
+// Remember that this is a call from rave's servers and
 // Your customer is not seeing the response here at all
 
   response.send(200);
@@ -103,7 +103,7 @@ app.get("https://polar-tundra-70244.herokuapp.com/1mp311b1", function(request, r
 
 //RESTful API - RESTAURANTS
 /* */
-var RestModel = require('./models/restaurant'),
+let RestModel = require('./models/restaurant'),
     productModel = require('./models/product'),
     Order = require('./models/order'),
 
